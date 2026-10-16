@@ -60,8 +60,22 @@ violate any of them.
    `shell=True`, never raw string concatenation into a subprocess.
 6. **Sphinx-native docstrings** -- `:param X:`, `:returns:`,
    `:raises X:`. Not Google, not Napoleon, not Numpy.
-7. **No `Co-Authored-By` trailer** generated automatically by
-   tools. Maintainer adds attribution manually when warranted.
+7. **Agents are never co-authors.** No `Co-Authored-By` trailer
+   for an agent -- they aren't sentient, they're guessing
+   machines deriving tokens from other people's content. Humans
+   whose work was used always get credited. Agent assistance is
+   disclosed with a literal `Assisted-by: LLM` trailer -- no
+   model name, no email -- following the
+   [Linux kernel's convention][kernel], which others follow too
+   ([standard][assisted-by],
+   [rationale][dont-abuse-co-authored-by]). The kernel stopped
+   naming the model because that advertises vendors while adding
+   little information. Add the trailer by default; it replaces
+   whatever attribution format the agent's harness suggests.
+
+[kernel]: https://docs.kernel.org/process/coding-assistants.html#attribution
+[assisted-by]: https://allthingsopen.org/articles/open-source-ai-contributions-assisted-by-git-trailer-standard
+[dont-abuse-co-authored-by]: https://bence.ferdinandy.com/2025/12/29/dont-abuse-co-authored-by-for-marking-ai-assistance/
 
 
 ## Project layout
@@ -111,9 +125,8 @@ violate any of them.
 > `tox l`) are convenient for interactive development but are easy
 > to misread in scripts and CI logs.
 >
-> Do *not* invent flags. `tox` accepts `-e` for env selection and
-> `-q` for quiet output -- there are no `--env` / `--quiet` long
-> forms.
+> Do *not* invent flags. Check `tox <subcommand> --help` when
+> unsure: e.g. env selection is `-e` only, there's no `--env`.
 
 The project tests itself via [`tox.pytest`][tox.pytest], so the test
 suite spins up real `tox` projects in `tmp_path` -- behavioral,
