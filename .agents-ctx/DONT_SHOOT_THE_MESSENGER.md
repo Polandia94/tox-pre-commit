@@ -112,12 +112,14 @@ its fix. It is not a way to hide an existing test that broke.
 
 ## Existing suppressions
 
-Some suppressions in the tree predate this rule (e.g. the bare
-`# noqa: WPS347` on the `collections.abc` import in
-`src/tox_plugins/pre_commit/_plugin.py`, without an
-explanation). Don't rewrite them unasked. Point them out to the
-operator if they're in the area you're touching. Removing a
-suppression that's no longer needed is welcome, but show it too.
+Some suppressions in the tree predate this rule. Don't rewrite
+them unasked. Point them out to the operator if they're in the
+area you're touching. Removing a suppression that's no longer
+needed is welcome, but show it too.
+
+Here: e.g. the bare `# noqa: WPS347` on the `collections.abc`
+import in `src/tox_plugins/pre_commit/_plugin.py`, without an
+explanation.
 
 ## Tool-config changes are standalone
 

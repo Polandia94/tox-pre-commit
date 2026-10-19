@@ -3,9 +3,9 @@
 The project uses `tox` as the single entry point for all local
 automation -- the same one CI and core devs use. Agents must
 never bypass it by invoking the wrapped tools (`pytest`,
-`pre-commit`, `coverage`, `build`, `twine`, etc.) directly; doing
-so skips project-specific configuration and is liable to run with
-unsupported, undefined, or outright dangerous defaults.
+`pre-commit`, `coverage`, `build`, `towncrier`, etc.) directly;
+doing so skips project-specific configuration and is liable to
+run with unsupported, undefined, or outright dangerous defaults.
 
 ## `tox list` is the source of truth
 
@@ -19,7 +19,7 @@ checking there first.
 
 `tox run -e py` runs the test suite under whichever Python
 runtime is currently active. Other environments cover other
-purposes (lint, building dists, validating their metadata,
+purposes (linting, building docs or dists, drafting the changelog,
 etc.) -- check `tox list` rather than assuming `py` is the only
 one relevant to a given task.
 
@@ -64,8 +64,11 @@ passes `-k smoke` to `pytest`, selecting only the matching tests.
 Watch out, though: when a `commands =` line uses
 `{posargs:<default value>}` with a *non-empty* default, anything
 passed after `--` **replaces that default wholesale** -- it does
-not get appended to it. Two real examples from this project's own
-`tox.ini`:
+not get appended to it. Always check what a given env's default
+posargs actually are (`tox config -e <env>`, or read `tox.ini`)
+before assuming `--` just "adds more flags."
+
+Here: two envs have non-empty defaults:
 
 - `py`'s `pytest` invocation defaults to
   `--cov-report=html:{envtmpdir}{/}htmlcov{/}` -- the `-k smoke`
@@ -76,18 +79,17 @@ not get appended to it. Two real examples from this project's own
   Its own `description` field documents adding `--all-files`
   back.
 
-Always check what a given env's default posargs actually are
-(`tox config -e <env>`, or read `tox.ini`) before assuming `--`
-just "adds more flags."
-
 ## Read the tool's own output
 
-`py` prints follow-up instructions after running -- where the
-HTML coverage report landed, and how to open or serve it locally.
-`pre-commit` prints where the MyPy reports landed, and a reminder
-of how to install its pre-commit hooks into Git. Read what the
-invocation actually printed instead of guessing a path or a next
-step.
+Many envs print follow-up instructions after running -- where an
+artifact landed, how to open or serve it, how to install hooks.
+Read what the invocation actually printed instead of guessing a
+path or a next step.
+
+Here: `py` prints where the HTML coverage report landed and how
+to open or serve it locally; `pre-commit` prints where the MyPy
+reports landed, and a reminder of how to install its hooks into
+Git.
 
 ## Parse structured output, not text meant for humans
 

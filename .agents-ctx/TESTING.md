@@ -1,9 +1,8 @@
 # Testing
 
-Grounded in the maintainer's review history in other projects
+Grounded in the maintainer's review history and merged commits
 (PR numbers below are from `ansible/pylibssh`), plus explicit
-maintainer conventions carried over from other projects — not
-guesses.
+maintainer conventions carried across projects — not guesses.
 
 ## Tests are proof, not decoration
 
@@ -15,19 +14,21 @@ a near-verbatim recurring review comment (e.g. PR #756, #786, #790,
 reason PRs stall or get closed unmerged.
 
 Justify new tests by what they actually verify, not by the
-coverage number alone. Coverage still matters a lot here --
-`.codecov.yml` targets 100%, and 100% coverage is a genuinely
-useful self-check (e.g. it can catch tests that silently start
-getting skipped in CI). The point is: don't game the number -- a
-test that exercises a line without meaningfully checking behavior
-doesn't count, passing or not. The same reasoning-over-metrics
-standard applies to every change, not just tests: infra,
-packaging, and runtime code all need well-reasoned,
-architecturally sound justification, not just a passing check.
+coverage number alone. Coverage still matters a lot -- 100%
+coverage is a genuinely useful self-check (e.g. it can catch tests
+that silently start getting skipped in CI). The point is: don't
+game the number -- a test that exercises a line without
+meaningfully checking behavior doesn't count, passing or not. The
+same reasoning-over-metrics standard applies to every change, not
+just tests: infra, packaging, and runtime code all need
+well-reasoned, architecturally sound justification, not just a
+passing check.
 
 Deleting, commenting out, skipping, xfailing, or weakening a test
 is never the agent's call -- see
 [DONT_SHOOT_THE_MESSENGER.md](DONT_SHOOT_THE_MESSENGER.md).
+
+Here: `.codecov.yml` targets 100%.
 
 ## No test classes
 
@@ -72,29 +73,15 @@ boundaries: the system clock/timezone, environment variables, or
 swapping in a stub server. It's not a substitute for designing
 components to be testable on their own.
 
-## Test doubles for intercepted components
-
-When end-to-end tests need to patch or intercept a real component
--- say, to withhold a server's replies -- the test double gets its
-own directory in the tests' stub area, named after its purpose
-rather than the library it's built on. Its `fixtures.py` module is
-the entry point, loaded as a local pytest plugin.
-
-- Entry points are imported eagerly at startup, so they must not
-  import their component's optional dependencies at the module
-  level. Import those inside a fixture through
-  `pytest.importorskip()`, so that a missing one skips only the
-  tests that need it. That's a declared optional dependency, not
-  a way to dodge a failure.
-- The stub area is excluded from the doctest collection, which
-  would otherwise import those dependencies.
-- Code running in child processes only gets its coverage recorded
-  when those processes exit cleanly instead of being killed.
-
 ## Test layout
 
 Test files are named `<topic>_test.py`, not `test_<topic>.py`.
 Match the existing file when extending it.
+
+Once the suite splits into categories, unit tests loosely mirror
+the source modules -- `<module>_test.py`, with a new file only for
+a genuinely new module -- while integration tests are organized by
+scenario or feature instead.
 
 Here: `tests/` is flat -- `smoke_test.py` (importability),
 `importable_test.py` (entry-point exposure), and
@@ -127,14 +114,26 @@ failure is expected, not just its type.
 Use pytest's built-in `tmp_path` fixture; don't hand-roll
 temp-directory setup/teardown.
 
+## Test payload data: readable while debugging, random once stable
+
+Printable, hand-crafted payload data helps root-cause bugs that
+corrupt data -- readability matters more than realism while chasing
+them. Once an implementation is no longer prone to that class of
+bug, prefer `random.randbytes()`-style payloads instead: building
+large printable payloads is inefficient, and random bytes exercise
+the code more realistically at scale. This is a tradeoff that
+shifts with implementation maturity, not a blanket "always use
+random data" rule.
+
 ## Type annotations on new tests
 
 New test functions and fixtures need type annotations too --
 parameters and return types -- same as any other new code. See
-[PR_HYGIENE.md](PR_HYGIENE.md) for the full rule.
+[PR_HYGIENE.md](PR_HYGIENE.md) for the full rule, including why it
+isn't retrofitted onto existing code as a side effect.
 
 ## Every test and fixture has a one-line docstring
 
 Describing what it checks or provides, not restating the code,
-e.g. `"""Isolate the tests from the user's tox configuration."""`.
-Enforced by `darglint` in CI.
+e.g. `"""Check that the config is parsed."""`. Enforced by the
+linters in CI.

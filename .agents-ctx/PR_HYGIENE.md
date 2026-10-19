@@ -1,15 +1,16 @@
 # PR & Commit Hygiene
 
-Grounded in the maintainer's review history in other projects
+Grounded in the maintainer's review history and merged commits
 (PR numbers below are from `ansible/pylibssh`), plus explicit
-maintainer conventions carried over from other projects — not
-guesses.
+maintainer conventions carried across projects — not guesses.
 
 ## Point contributors to the official guidelines
 
-Route contributors to `.github/CONTRIBUTING.md` and
-`.github/CODE_OF_CONDUCT.md` for the canonical contribution
-process, rather than improvising or restating it secondhand.
+Route contributors to the project's contributing guidelines and
+code of conduct for the canonical contribution process, rather
+than improvising or restating it secondhand.
+
+Here: `.github/CONTRIBUTING.md` and `.github/CODE_OF_CONDUCT.md`.
 
 ## Keep PRs and commits atomic and scoped
 
@@ -116,6 +117,37 @@ experimental states.
 
 Publishing the result is a force-push, which is the operator's to
 run -- see [HUMAN_IN_THE_LOOP.md](HUMAN_IN_THE_LOOP.md).
+
+## Every change needs a changelog fragment
+
+Every PR needs at least one changelog fragment. Consider every
+audience the change affects -- end users, contributors, downstream
+packagers -- and add a fragment for each.
+
+A changelog fragment is not a restated commit message -- it covers
+everything since the previous release, for end-users, not
+developers. Changelog entries are a permanent historical record:
+they're never retroactively removed, even if the underlying code
+is later reverted, unlike commit history, which can be reworded,
+rebased, or squashed.
+
+Recurring, specific review feedback:
+
+- One change per fragment, not several changes "smashed" into one
+  (#756, #862).
+- Wording is past-tense and end-user-facing, not
+  imperative/developer-facing.
+- Reference related issues, PRs, users, and files through the
+  roles the docs tooling provides, instead of raw links or
+  backticks (#620, #786, #790, #809).
+- A byline credits a human. Whether the operator gets one, and in
+  which form, depends on how involved they feel, so ask them (see
+  [HUMAN_IN_THE_LOOP.md](HUMAN_IN_THE_LOOP.md)). Fully agentic
+  work gets none -- crediting a probabilistic machine in a loop is
+  silly. Disclose agent involvement in the PR instead.
+
+Here: there's no changelog tooling yet. When Towncrier lands,
+fragments will be Markdown, not RST.
 
 ## Credit the people whose work you use
 

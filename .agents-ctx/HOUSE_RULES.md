@@ -105,7 +105,8 @@ structured in this project.
 ## PR and commit hygiene
 
 See [PR_HYGIENE.md](PR_HYGIENE.md) for scope, commit-message,
-and naming conventions maintainers consistently enforce in review.
+changelog-fragment, and naming conventions maintainers
+consistently enforce in review.
 
 ## Don't ghost the reviewer
 
