@@ -3,8 +3,8 @@
 The project uses `tox` as the single entry point for all local
 automation -- the same one CI and core devs use. Agents must
 never bypass it by invoking the wrapped tools (`pytest`,
-`pre-commit`, `coverage`, `towncrier`, etc.) directly; doing so
-skips project-specific configuration and is liable to run with
+`pre-commit`, `coverage`, `build`, `twine`, etc.) directly; doing
+so skips project-specific configuration and is liable to run with
 unsupported, undefined, or outright dangerous defaults.
 
 ## `tox list` is the source of truth
@@ -19,7 +19,7 @@ checking there first.
 
 `tox run -e py` runs the test suite under whichever Python
 runtime is currently active. Other environments cover other
-purposes (lint, docs build, changelog draft/check, packaging,
+purposes (lint, building dists, validating their metadata,
 etc.) -- check `tox list` rather than assuming `py` is the only
 one relevant to a given task.
 
@@ -58,28 +58,23 @@ re-explained here.
 ## Passing arguments through to the wrapped tool
 
 Arguments after a bare `--` are forwarded to whatever tool the
-environment wraps. For example, `tox run -e py -- -n0` passes
-`-n0` to `pytest`, disabling `pytest-xdist` parallelism for that
-run -- safe here since this project's `py`/`just-pytest` envs
-both use a bare `{posargs:}` with an empty default in `tox.ini`,
-so there's nothing to lose.
+environment wraps. For example, `tox run -e py -- -k smoke`
+passes `-k smoke` to `pytest`, selecting only the matching tests.
 
-That's not true everywhere, though: when a `commands =` line uses
+Watch out, though: when a `commands =` line uses
 `{posargs:<default value>}` with a *non-empty* default, anything
 passed after `--` **replaces that default wholesale** -- it does
 not get appended to it. Two real examples from this project's own
 `tox.ini`:
 
-- `build-docs`'s Sphinx invocation defaults to a full flag set
-  (`-j auto -b html ... -a -n -W --keep-going -d ... . <output>`)
-  via `{posargs:...}` -- passing any custom posargs there replaces
-  the whole thing, not just adds to it.
-- `make-changelog`'s default posargs are `'[UNRELEASED DRAFT]'
-  --draft` (draft-preview mode); its own `description` field
-  documents overriding this deliberately -- passing a real version
-  after `--` (e.g. `tox run -e make-changelog -- 1.3.2`) switches
-  it into actually cutting that release, dropping `--draft`
-  entirely.
+- `py`'s `pytest` invocation defaults to
+  `--cov-report=html:{envtmpdir}{/}htmlcov{/}` -- the `-k smoke`
+  run above drops the HTML coverage report, and the hint on how
+  to open it along with it.
+- `pre-commit` defaults to `--all-files`; passing a hook ID alone
+  (`tox run -e pre-commit -- mypy`) only checks the staged files.
+  Its own `description` field documents adding `--all-files`
+  back.
 
 Always check what a given env's default posargs actually are
 (`tox config -e <env>`, or read `tox.ini`) before assuming `--`
@@ -87,11 +82,12 @@ just "adds more flags."
 
 ## Read the tool's own output
 
-`build-docs` prints follow-up instructions after running -- where
-the built HTML docs landed, and how to serve them locally. `pre-commit`
-prints a reminder of how to install its pre-commit hooks into
-Git. Read what the invocation actually printed instead of
-guessing a path or a next step.
+`py` prints follow-up instructions after running -- where the
+HTML coverage report landed, and how to open or serve it locally.
+`pre-commit` prints where the MyPy reports landed, and a reminder
+of how to install its pre-commit hooks into Git. Read what the
+invocation actually printed instead of guessing a path or a next
+step.
 
 ## Parse structured output, not text meant for humans
 

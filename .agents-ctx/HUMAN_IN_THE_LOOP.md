@@ -78,9 +78,6 @@ comfortable having their name on it, and in what form: their
 byline, a note that they operated an agent to get it done, or
 nothing at all when the work was fully agentic. Never assume.
 
-Here: an operator-directed change note has been signed
-``-- steered by :user:`<login>`, typed by a robot that errs``.
-
 ## Why: the maintainers and reviewers are in the loop too
 
 "There should be a human in the loop" is often satisfied only on

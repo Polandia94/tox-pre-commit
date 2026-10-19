@@ -74,7 +74,7 @@ Scope a suppression to the single line that needs it, name the
 specific codes, and explain why it exists and when it can go:
 
 ```python
-value = call(42)  # noqa: WPS432  # mirrors libssh's SSH_OK; drop once exposed as a named constant
+value = call(42)  # noqa: WPS432  # mirrors an upstream constant; drop once it's exposed by name
 ```
 
 Blanket `# noqa` without codes is rejected by the
@@ -112,8 +112,9 @@ its fix. It is not a way to hide an existing test that broke.
 
 ## Existing suppressions
 
-Many suppressions in the tree predate this rule (e.g. bare
-`# noqa: DAR101` lines in `tests/conftest.py` without an
+Some suppressions in the tree predate this rule (e.g. the bare
+`# noqa: WPS347` on the `collections.abc` import in
+`src/tox_plugins/pre_commit/_plugin.py`, without an
 explanation). Don't rewrite them unasked. Point them out to the
 operator if they're in the area you're touching. Removing a
 suppression that's no longer needed is welcome, but show it too.
